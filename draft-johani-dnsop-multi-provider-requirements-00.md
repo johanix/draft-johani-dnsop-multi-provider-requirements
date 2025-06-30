@@ -142,8 +142,8 @@ to be able to fully support all multi-provider scenarios:
 
 # Desirable Features (i.e. not Requirements)
 
-1. A signing DNS provider SHOULD be able to use a "standard" DNSSEC
-   signer application. I.e. it should be possible to use signers that
+1. A signing DNS provider SHOULD be able to use a "standard DNSSEC
+   signer" application. I.e. it should be possible to use signers that
    are not specifically aware of the multi provider setup. "Standard
    DNSSEC signer" is defined as a bump-on-the-wire DNSSEC signer with
    support for multi-signer key rollovers.
