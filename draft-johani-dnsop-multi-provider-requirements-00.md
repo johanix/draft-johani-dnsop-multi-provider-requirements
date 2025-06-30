@@ -125,8 +125,12 @@ to be able to fully support all multi-provider scenarios:
 6. All signing parties MUST be able to perform multi-signer key
    rollovers (ZSK/KSK/CSK).
 
+   TODO: Specify what a multi-signer key rollover is.
+
 7. All DNS providers MUST be able to initiate synchronization of
    changed data by notifying the other providers.
+
+   TODO: Specify what data (which RRsets).
 
 8. All DNS providers MUST be able to fetch data from another DNS
    provider using a secure mechanism.
@@ -135,6 +139,8 @@ to be able to fully support all multi-provider scenarios:
 
 10. Responsibility for updates to the delegation information in the
     parent zone MUST be explicit.
+
+   QUESTION: What exactly does this mean?
 
 11. The zone owner MUST be able to add and remove DNS providers from
     the multi-provider setup, and the providers' infrastructure must
