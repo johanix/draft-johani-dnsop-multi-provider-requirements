@@ -40,9 +40,9 @@ when, and only when, they appear in all capitals, as shown here.
 DNS Provider: A provider of DNS services such as DNSSEC signing of an
 unsigned zone and/or authoritative publication of a DNS zone.
 
-Signing Party: A DNS provider responsible for signing a zone
+Signing Party: A DNS provider responsible for signing a zone.
 
-Publishing Party: A DNS provider responsible for publishing a zone
+Publishing Party: A DNS provider responsible for publishing a zone.
 
 # Goal
 
