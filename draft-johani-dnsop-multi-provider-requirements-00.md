@@ -150,7 +150,7 @@ to be able to fully support all multi-provider scenarios:
 
 # Scenario-based analysis
 
-This section describes a system of analysing scenarios with respect to
+This section describes a system of analyzing scenarios with respect to
 zone contents and then derive requirements from the generation and
 modifications of those zones. The idea is that any mechanism can be linked
 through the requirements to particular contents of changes to the contents
@@ -158,12 +158,12 @@ of a zone that are needed.
 
 ## Scenarios
 
-This subsection lists the scenarios that are analysed in order from low
+This subsection lists the scenarios that are analyzed in order from low
 to high complexity.
 
 1) Simple multi-signer
 
-   This scenario consistents of two providers A and B that each both sign and
+   This scenario consists of two providers A and B that each both sign and
    provide the zone. Both providers receive an unsigned zone from the zone
    owner. The parent has a CDS/CDNSKEY/CSYNC scanner.
 
@@ -192,7 +192,7 @@ NS_A and NS_B. At the parent the DS records refer to KSK_A and KSK_B.
 
 RFC 6781 describes two ZSK rolls, a Pre-Publish ZSK roll and a
 Double-Signature ZSK roll. In a multi-signer environment, the Double-Signature
-ZSK roll has fewer synchronisation requirements, but is negerally undesirable
+ZSK roll has fewer synchronization requirements, but is generally undesirable
 because it leads to more signatures. We will first look at the Double-Signature
 ZSK roll.
 
@@ -212,7 +212,7 @@ roll is complete.
 
 For the Pre-Publish ZSK roll, provider A first adds ZSK_An to its DNSKEY RRset
 and informs provider B that is now has two ZSKs: ZSK_A and ZSK_An.
-Provider A montors the propagation of its own zone and waits for confirmation
+Provider A monitors the propagation of its own zone and waits for confirmation
 from provider B that the new DNSKEY RRset has fully propagated.
 
 Then provider A starts signing with ZSK_An and monitors propagation. This is
@@ -260,7 +260,7 @@ When the DS RRset has fully propagated, provider A removes KSK_A from its
 DNSKEY RRset and adds KSK_An. Provider A monitors the propagation of the
 new DNSKEY RRset.
 
-When the DNSKET RRset has fully propagated, provider A tries to agree with
+When the DNSKEY RRset has fully propagated, provider A tries to agree with
 provider B on new CDS/CDNSKEY RRsets that include KSK_An (and no longer KSK_A).
 When agreement has been reached, provider A
 publishes the CDS/CDNSKEY RRset and assumes that provider B will do so as
@@ -304,29 +304,29 @@ Provider A monitors the parent NS RRset. When provider A notices the parent
 NS RRset contains NS_An it can try to agree with provider B to remove the
 CSYNC record.
 
-### Onboarding a new provider
+### On-boarding a new provider
 
-To onboard provider C, provider MUST first ensure that its ZSK_C is in the
+To on-board provider C, provider MUST first ensure that its ZSK_C is in the
 DNSKEY RRsets of provider A and B. Then it MUST coordinate with provider A
 and C to update the DS RRset at the parent to refer to KSK_C. Finally
-provider C MUST coordinate with provier A and B to update the NS RRsets
+provider C MUST coordinate with provider A and B to update the NS RRsets
 at the apex of A and B and at the parent to include NS_C.
 
-### Offboarding 
+### Off-boarding 
 
-Offboarding goes in the oposite order of onboarding.
+Off-boarding goes in the opposite order of on-boarding.
 
 ### Requirements
 
 1) The zone owner specifies that provider A and provider B both sign
-   the zone and serve the zone. That A and B take full controll over the 
+   the zone and serve the zone. That A and B take full control over the 
    NS RRset and that parent zone scans for CDS/CDNSKEY/CSYNC.
 
 2) The zone owner provides both providers with an unsigned copy of the zone.
    The zone SHOULD NOT include the apex CDS, CDNSKEY, CSYNC, DNSKEY, and
    NS RRsets. 
 
-   Open question: does the SOA version have any meening beyond transfering 
+   Open question: does the SOA version have any meaning beyond transferring 
    the zone to the providers?
 
 3) There is a mechanism that allows a provider to inform another provider of
