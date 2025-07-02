@@ -1,10 +1,9 @@
 # Introduction
 
-Multi-provider DNS setups are increasingly common, not least because
-this is the recommended Best Current Practice.  Furthermore, the zones
-that acquire multi-provider support are, quite naturally, among the
-more important and critical zones on the public Internet. However, in
-a very large fraction of the multi-provider setups there are manual
+Multi-provider DNS setups are increasingly common.  Furthermore, the
+zones that acquire multi-provider support are, quite naturally, among
+the more important and critical zones on the public Internet. However,
+in a very large fraction of the multi-provider setups there are manual
 steps, which is error-prone and carries operational risks. In other
 cases, the steps may be automated, but in the absence of a "standard"
 for DNS multi-provider setups the exact steps may be a function of
@@ -101,10 +100,12 @@ between the signing parties during each step of the key rollover process.
 For example, a signing party must not use a new ZSK for signing until all
 signing parties have published the new ZSK.
 
-# Mandatory Requirements
+# Hard Requirements
 
-A multi-provider architecture must fulfill the following requirements
-to be able to fully support all multi-provider scenarios:
+"Hard requirements" are those that must be followed by a successful
+protocol {{?RFC5218}}, because violating them would present too much of
+an obstacle for broad adoption.  These will primarily be related to
+enabling automation for core multi-provider scenarios.
 
 1. Each party (each DNS provider) MUST be able to identify and
    authenticate all other DNS providers via a secure mechanism without
@@ -145,7 +146,12 @@ to be able to fully support all multi-provider scenarios:
     the multi-provider setup, and each provider's infrastructure must
     handle such changes automatically without manual intervention.
 
-# Desirable Features (i.e. not Requirements)
+# Soft Requirements
+
+"Soft requirements" are those that are desirable, but the absence of
+which does not intrinsically eliminate a design.  These will largely
+be descriptive of the problems that are trying to be addressed with a
+new method, or features that would ease adoption.
 
 1. A signing DNS provider SHOULD be able to use a "standard DNSSEC
    signer" application. I.e. it should be possible to use signers that
