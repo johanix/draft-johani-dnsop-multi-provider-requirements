@@ -137,10 +137,9 @@ to be able to fully support all multi-provider scenarios:
 
 9. DNS service for unsigned zones MUST be supported.
 
-10. Responsibility for updates to the delegation information in the
-    parent zone MUST be explicit.
-
-   QUESTION: What exactly does this mean?
+10. Updates to the delegation information in the parent zone are either
+    applied automatically if supported by the parent, or otherwise
+    by a designated party (likely the domain holder).
 
 11. The zone owner MUST be able to add and remove DNS providers from
     the multi-provider setup, and each provider's infrastructure must
