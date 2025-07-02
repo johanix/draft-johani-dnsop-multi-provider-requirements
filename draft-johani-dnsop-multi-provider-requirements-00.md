@@ -122,7 +122,7 @@ to be able to fully support all multi-provider scenarios:
 5. All signing parties MUST be able to contribute to the CDS and CDNSKEY
    RRsets in the zone.
 
-6. All signing parties MUST be able to perform multi-signer key
+6. All signing parties MUST be able to perform multi-signer-aware key
    rollovers (ZSK/KSK/CSK).
 
    TODO: Specify what a multi-signer key rollover is.
@@ -143,7 +143,7 @@ to be able to fully support all multi-provider scenarios:
    QUESTION: What exactly does this mean?
 
 11. The zone owner MUST be able to add and remove DNS providers from
-    the multi-provider setup, and the providers' infrastructure must
+    the multi-provider setup, and each provider's infrastructure must
     handle such changes automatically without manual intervention.
 
 # Desirable Features (i.e. not Requirements)
