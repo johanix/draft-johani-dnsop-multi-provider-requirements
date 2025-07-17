@@ -78,12 +78,7 @@ Some examples of multi-provider scenarios:
 # Multi-provider Complexity
 
 All multi-provider setups inevitably add complexity (having multiple
-providers is more complex than having only one). The goal is to localize
-the complexity by making the zone owner intent and the technical
-requirements as explicit as possible.
-
-The more explicit the intent and requirements are (i.e. fewer assumptions)
-the easier it will be to fully automate implementations.
+providers is more complex than having only one).
 
 ## Multi-provider Synchronization
 
@@ -111,8 +106,8 @@ enabling automation for core multi-provider scenarios.
    authenticate all other DNS providers via a secure mechanism without
    manual handholding by the zone owner.
 
-2. All publishing parties MUST be able to contribute to the NS RRset in
-   the zone.
+2. The solution MUST interface cleanly with mechanisms that enable
+   automatic updates of the parent-side NS RRset (once standardized).
 
 3. All publishing parties MUST be able to trigger the publication of a
    CSYNC record.
