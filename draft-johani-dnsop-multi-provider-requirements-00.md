@@ -111,8 +111,8 @@ enabling automation for core multi-provider scenarios.
    authenticate all other DNS providers via a secure mechanism without
    manual handholding by the zone owner.
 
-2. All publishing parties MUST be able to contribute to the NS RRset in
-   the zone.
+2. The solution MUST interface cleanly with mechanisms that enable
+   automatic updates of the parent-side NS RRset (once standardized).
 
 3. All publishing parties MUST be able to trigger the publication of a
    CSYNC record.
