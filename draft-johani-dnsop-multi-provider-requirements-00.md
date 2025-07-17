@@ -78,12 +78,7 @@ Some examples of multi-provider scenarios:
 # Multi-provider Complexity
 
 All multi-provider setups inevitably add complexity (having multiple
-providers is more complex than having only one). The goal is to localize
-the complexity by making the zone owner intent and the technical
-requirements as explicit as possible.
-
-The more explicit the intent and requirements are (i.e. fewer assumptions)
-the easier it will be to fully automate implementations.
+providers is more complex than having only one).
 
 ## Multi-provider Synchronization
 
