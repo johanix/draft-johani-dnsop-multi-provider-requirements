@@ -88,6 +88,16 @@ publishing party changes the NS RRset, this must be communicated to
 all other DNS providers, preferably using a secure and authenticated
 mechanism.
 
+Data that requires synchronization includes the DNSKEY, CDNSKEY, and CDS
+RRsets across providers. In addition to these DNSSEC records, the NS and
+CSYNC RRsets should also be synchronized, to provide a consistent view
+towards the parent.
+
+Note 1: What about glue?
+
+Note 2: The list of RRset types to be synchronized may be extended in the
+future.
+
 ## Multi-signer Key Rollovers
 
 The multi-signer scenario has an additional need for synchronization
@@ -125,8 +135,6 @@ enabling automation for core multi-provider scenarios.
 
 7. All DNS providers MUST be able to initiate synchronization of
    changed data by notifying the other providers.
-
-   TODO: Specify what data (which RRsets).
 
 8. All DNS providers MUST be able to fetch data from another DNS
    provider using a secure mechanism.
