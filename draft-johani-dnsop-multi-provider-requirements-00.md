@@ -139,13 +139,11 @@ enabling automation for core multi-provider scenarios.
 8. All DNS providers MUST be able to fetch data from another DNS
    provider using a secure mechanism.
 
-9. DNS service for unsigned zones MUST be supported.
-
-10. Updates to the delegation information in the parent zone are either
+9. Updates to the delegation information in the parent zone are either
     applied automatically if supported by the parent, or otherwise
     by a designated party (likely the domain holder).
 
-11. The zone owner MUST be able to add and remove DNS providers from
+10. The zone owner MUST be able to add and remove DNS providers from
     the multi-provider setup, and each provider's infrastructure must
     handle such changes automatically without manual intervention.
 
@@ -161,6 +159,8 @@ new method, or features that would ease adoption.
    are not specifically aware of the multi provider setup. "Standard
    DNSSEC signer" is defined as a bump-on-the-wire DNSSEC signer with
    support for multi-signer key rollovers.
+
+2. DNS service for unsigned zones MUST be supported.
 
 # Security Considerations
 
