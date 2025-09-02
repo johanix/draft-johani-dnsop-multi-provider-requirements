@@ -36,8 +36,15 @@ when, and only when, they appear in all capitals, as shown here.
 
 # Terminology
 
+Zone Owner: In the RRR model, this is the registrant.
+
+Primary DNS Operator (PDO): Either the zone owner itself or a DNS operator acting on
+behalf of the zone owner as the primary master. Example: zone owner manages the
+zone via a web GUI hosted by the primary DNS operator.
+
 DNS Provider: A provider of DNS services such as DNSSEC signing of an
-unsigned zone and/or authoritative publication of a DNS zone.
+unsigned zone and/or authoritative publication of a DNS zone. The PDO may also
+be a DNS Provider.
 
 Signing Party: A DNS provider responsible for signing a zone.
 
@@ -46,9 +53,10 @@ Publishing Party: A DNS provider responsible for publishing a zone.
 # Goal
 
 The intent is to make it possible for a zone owner to specify what
-role each DNS provider should fulfill in sufficient detail to
-henceforth not be forced to get involved in operations of the DNS
-providers or in synchronization between them.
+role each DNS provider should fulfill. The specification should be
+sufficiently detailed to allow the zone owner to henceforth not be
+forced to get involved in operations of the DNS providers or in
+synchronization between them.
 
 I.e. once the multi-provider setup is in operation (and as long as the
 zone owner does not explicitly change the instructions) the DNS
