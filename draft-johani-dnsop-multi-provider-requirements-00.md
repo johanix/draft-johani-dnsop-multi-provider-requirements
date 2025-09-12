@@ -167,7 +167,18 @@ to high complexity.
    provide the zone. Both providers receive an unsigned zone from the zone
    owner. The parent has a CDS/CDNSKEY/CSYNC scanner.
 
+2) Simple unsigned zone with multiple providers
+
+   This scenarios consists of two providers A and B that each provide the
+   zone. Both providers receive the unsigned zone from the zone owner.
+   There is currently no mechanism for the parent to automatically pick
+   up changed to the NS RRset.
+
+3) Future work to let the parent update the NS RRset for an unsigned zone.
+
 (More scenarios are needed)
+
+a) Parent without CDS/CDNSKEY/CSYNC scanner
 
 ## Simple multi-signer Scenario
 
@@ -190,108 +201,23 @@ NS_A and NS_B. At the parent the DS records refer to KSK_A and KSK_B.
 
 ### ZSK rolls
 
-RFC 6781 describes two ZSK rolls, a Pre-Publish ZSK roll and a
-Double-Signature ZSK roll. In a multi-signer environment, the Double-Signature
-ZSK roll has fewer synchronization requirements, but is generally undesirable
-because it leads to more signatures. We will first look at the Double-Signature
-ZSK roll.
-
 We assume that the zone of provide A is currently signed with ZSK_A and
-that provider wants to roll to ZSK_An. Provider A starts by signing the
-zone with ZSK_An in addition to ZSK_A. This is a local operation of
-provider A. Provider A waits until all nameservers of provider A serve the
-new zone and any cache have expired. 
+that provider wants to roll to ZSK_An. 
 
-Now provider A changes its DNSKEY RRset to consist of KSK_A, ZSK_An and ZSK_B
-and informs provider B to replace ZSK_A with ZSK_An. Provider A monitors
-the propagation of its own zone. Provider A also need to get confirmation
-from provider B that ZSK_An is fully propagated.
+Changes to the DNSKEY RRset require coordination.
+Other parts of the ZSK roll are local.
 
-Once that state is reached, provider A stops signing with ZSK_A and the key
-roll is complete.
-
-For the Pre-Publish ZSK roll, provider A first adds ZSK_An to its DNSKEY RRset
-and informs provider B that is now has two ZSKs: ZSK_A and ZSK_An.
-Provider A monitors the propagation of its own zone and waits for confirmation
-from provider B that the new DNSKEY RRset has fully propagated.
-
-Then provider A starts signing with ZSK_An and monitors propagation. This is
-a local operation.
-
-Finally, provider A removes ZSK_A from the DNSKEY RRset and informs provider B
-that it should only include ZSK_An in its DNSKEY RRset. The key roll is now
-complete though provider A SHOULD monitor the propagation of its DNSKEY
-RRset and ask provider B to report on propagation as well.
+When (for example) provider A changes its DNSKEY RRset to consist of KSK_A, ZSK_An and ZSK_B then provider B is informed to replace ZSK_A with ZSK_An.
+Provider A monitors the propagation of its own zone.
+Provider A also need to get confirmation from provider B that ZSK_An is fully propagated.
 
 ### KSK rolls
 
-RFC 6781 defines two KSK rolls: the Double-Signature KSK roll and the
-Double-DS KSK roll. The Double-Signature KSK roll is easiest and we will
-look that first.
+We assume provider A wants to roll to KSK_An. 
 
-We assume provider A wants to roll to KSK_An. First provider A adds
-KSK_An to its DNSKEY RRset. Provider A monitors the propagation of its
-DNSKEY RRset.
-
-When that has happened, provider A and B need to agree on new CDS/CDNSKEY
-RRsets. Provider A needs the new CDS/CDNSKEY RRset to contain or refer to
-KSK_An. When agreement has been reached, provider A publishes the CDS/CDNSKEY
-RRset and assumes that provider B will do so as well. 
-
-Provider A checks that the parent has a DS record for KSK_An and tries to 
-monitor to propagation of the DS RRset.
-
-When the DS RRset has fully propagated, provider A removes KSK_A from its
-DNSKEY RRset, and tries to reach agreement to remove the CDS/CDNSKEY RRset.
-
-The key roll is now complete but provider A SHOULD monitor the propagation
-of its new DNSKEY RRset.
-
-The Double-DS KSK roll starts with introducing the new KSK_An in the parent's
-DS RRset. Provider A and B need to agree on a new CDS/CDNSKEY RRsets that
-include both KSK_A and KSK_An. When agreement has been reached, provider A
-publishes the CDS/CDNSKEY RRset and assumes that provider B will do so as
-well.
-
-Provider A checks that the parent has a DS record for both KSK_A and KSK_An
-and tries to monitor to propagation of the DS RRset.
-
-When the DS RRset has fully propagated, provider A removes KSK_A from its
-DNSKEY RRset and adds KSK_An. Provider A monitors the propagation of the
-new DNSKEY RRset.
-
-When the DNSKEY RRset has fully propagated, provider A tries to agree with
-provider B on new CDS/CDNSKEY RRsets that include KSK_An (and no longer KSK_A).
-When agreement has been reached, provider A
-publishes the CDS/CDNSKEY RRset and assumes that provider B will do so as
-well.
-
-Provider A checks that the parent has a DS record for KSK_An. Then
-provider A tries to reach agreement with provider B to remove the CDS/CDNSKEY
-RRset.
-
-(Alternatively: both provider A and B monitor the DS RRset set the parent.
-When the DS RRset matches the agreed upon set of keys, each provider
-independently removes to CDS and CDNSKEY RRsets. Is there a risk?)
-
-### CSK rolls
-
-RFC 6781 recognizes Straightforward Rollover in a Single-Type Signing Scheme
-and Double-DS Rollover in a Single-Type Signing Scheme
-
-The Straightforward Rollover combines the elements of the Double-Signature
-ZSK roll with those of the Double-Signature KSK roll. No new requirements
-should be necessary.
-
-The Double-DS Rollover combines the Pre-Publish ZSK roll with the
-Double-DS KSK roll. Again no new requirements should be necessary.
-
-### Algorithm rolls
-
-RFC 6781 defines the conservative roll and somewhat describes the liberal
-roll. The conservative roll combines the Double-Signature ZSK roll with
-the Double-Signature KSK roll where the steps in the ZSK and KSK rolls are
-separated. No new requirements are expected.
+Coordination is required regarding the contents of the CDS/CDNSKEY RRsets and
+their signatures. Provider A and B update each other about changes to the
+CDS/CDNSKEY RRsets including signatures.
 
 ### Updating the NS RRset at the parent
 
@@ -326,9 +252,6 @@ Off-boarding goes in the opposite order of on-boarding.
    The zone SHOULD NOT include the apex CDS, CDNSKEY, CSYNC, DNSKEY, and
    NS RRsets. 
 
-   Open question: does the SOA version have any meaning beyond transferring 
-   the zone to the providers?
-
 3) There is a mechanism that allows a provider to inform another provider of
    its current set of ZSKs.
 
@@ -340,6 +263,105 @@ Off-boarding goes in the opposite order of on-boarding.
 
 6) There is a mechanism that allows a provider to propose changes to the 
    NS RRset and get agreement on the contents of the set.
+
+## Simple unsigned zone with multiple providers
+
+This subsection analyses the simple multi-provider scenario
+
+### Zone contents
+
+Lets assume that each provider has NS records, NS_A for provider A and
+NS_B for
+provider B.
+
+The quiescent state is the following:
+
+Both providers serve the zone with an NS RRset that consists of
+NS_A and NS_B. At the parent the delegation NS RRset is the same.
+Where needed, the parent has glue consistent with the data in the zone.
+
+### Updating the NS RRset at the parent
+
+When provider A wants to change its NS RRset to NS_An, it can just update the
+NS RRset at the apex of the zone locally. Provider A then tries to agree with
+provider B on a new NS RRset. When agreement is reached provider A adds a
+CSYNC record to the zone.
+
+Currently there is no mechanism to update the parent NS RRset automatically
+for unsigned zones. 
+
+An agent that operates on behalf of the zone owner has to be informed.
+This agent can then use an API provided by the registrar to update the NS
+RRset and any required glue.
+
+### On-boarding a new provider
+
+To on-board provider C, provider C MUST coordinate with provider A and B to
+update the NS RRsets at the apex of A and B and at the parent to include NS_C.
+
+### Off-boarding 
+
+Off-boarding goes in the opposite order of on-boarding.
+
+### Requirements
+
+1) The zone owner provides both providers with an unsigned copy of the zone.
+   The zone SHOULD NOT include the apex NS RRset.
+
+2) There is a mechanism that allows a provider to propose changes to the 
+   NS RRset and get agreement on the contents of the set.
+
+## Future work to let the parent update the NS RRset for an unsigned zone.
+
+This subsection analyses the simple multi-provider scenario where the
+parent has a mechanism to automatically update the NS RRset.
+
+### Zone contents
+
+Lets assume that each provider has NS records, NS_A for provider A and
+NS_B for
+provider B.
+
+The quiescent state is the following:
+
+Both providers serve the zone with an NS RRset that consists of
+NS_A and NS_B. At the parent the delegation NS RRset is the same.
+Where needed, the parent has glue consistent with the data in the zone.
+
+### Updating the NS RRset at the parent
+
+When provider A wants to change its NS RRset to NS_An, it can just update the
+NS RRset at the apex of the zone locally. Provider A then tries to agree with
+provider B on a new NS RRset. When agreement is reached provider A adds a
+CSYNC record to the zone.
+
+Using ideas from RFC 9615 (Automatic DNSSEC Bootstrapping Using Authenticated
+Signals from the Zone's Operator) a new protocol could be designed
+to update the parent NS RRset.
+
+If some of the current nameserver for the zone are in DNSSEC signed zones
+then they can published the new NS RRset under something like:
+_nsupdate.example.co.uk._signal.ns1.example.net
+
+There are there two problems that need to be solved:
+* The creation of a 'CNS' record that has a similar role as the CDS record.
+* A name scheme for in-bailiwick glue records. For example
+  ns1._nsupdate.example.co.uk._signalns1.example.net IN AAAA
+  could be the glue for ns1.example.co.uk.
+
+### On-boarding a new provider
+
+To on-board provider C, provider C MUST coordinate with provider A and B to
+update the NS RRsets at the apex of A and B and at the parent to include NS_C.
+
+### Off-boarding 
+
+Off-boarding goes in the opposite order of on-boarding.
+
+### Requirements
+
+1) A mechanism the signals the parent in a secure way that the parent
+   NS RRset needs to be updated.
 
 # Security Considerations
 
