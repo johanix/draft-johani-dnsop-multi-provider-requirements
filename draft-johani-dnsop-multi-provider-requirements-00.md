@@ -1,10 +1,9 @@
 # Introduction
 
-Multi-provider DNS setups are increasingly common, not least because
-this is the recommended Best Current Practice.  Furthermore, the zones
-that acquire multi-provider support are, quite naturally, among the
-more important and critical zones on the public Internet. However, in
-a very large fraction of the multi-provider setups there are manual
+Multi-provider DNS setups are increasingly common.  Furthermore, the
+zones that acquire multi-provider support are, quite naturally, among
+the more important and critical zones on the public Internet. However,
+in a very large fraction of the multi-provider setups there are manual
 steps, which is error-prone and carries operational risks. In other
 cases, the steps may be automated, but in the absence of a "standard"
 for DNS multi-provider setups the exact steps may be a function of
@@ -40,9 +39,9 @@ when, and only when, they appear in all capitals, as shown here.
 DNS Provider: A provider of DNS services such as DNSSEC signing of an
 unsigned zone and/or authoritative publication of a DNS zone.
 
-Signing Party: A DNS provider responsible for signing a zone
+Signing Party: A DNS provider responsible for signing a zone.
 
-Publishing Party: A DNS provider responsible for publishing a zone
+Publishing Party: A DNS provider responsible for publishing a zone.
 
 # Goal
 
@@ -79,12 +78,7 @@ Some examples of multi-provider scenarios:
 # Multi-provider Complexity
 
 All multi-provider setups inevitably add complexity (having multiple
-providers is more complex than having only one). The goal is to localize
-the complexity by making the zone owner intent and the technical
-requirements as explicit as possible.
-
-The more explicit the intent and requirements are (i.e. fewer assumptions)
-the easier it will be to fully automate implementations.
+providers is more complex than having only one).
 
 ## Multi-provider Synchronization
 
@@ -94,59 +88,78 @@ publishing party changes the NS RRset, this must be communicated to
 all other DNS providers, preferably using a secure and authenticated
 mechanism.
 
+Data that requires synchronization includes the DNSKEY, CDNSKEY, and CDS
+RRsets across providers. In addition to these DNSSEC records, the NS and
+CSYNC RRsets should also be synchronized, to provide a consistent view
+towards the parent.
+
+Note 1: What about glue?
+
+Note 2: The list of RRset types to be synchronized may be extended in the
+future.
+
 ## Multi-signer Key Rollovers
 
 The multi-signer scenario has an additional need for synchronization
 between the signing parties during each step of the key rollover process.
-For example, a signing party MUST NOT use a new ZSK for signing until all
+For example, a signing party must not use a new ZSK for signing until all
 signing parties have published the new ZSK.
 
-# Mandatory Requirements
+# Hard Requirements
 
-A multi-provider architecture must fulfill the following requirements
-to be able to fully support all multi-provider scenarios:
+"Hard requirements" are those that must be followed by a successful
+protocol {{?RFC5218}}, because violating them would present too much of
+an obstacle for broad adoption.  These will primarily be related to
+enabling automation for core multi-provider scenarios.
 
-1. Each party (each DNS provider) must be able to identify and
+1. Each party (each DNS provider) MUST be able to identify and
    authenticate all other DNS providers via a secure mechanism without
    manual handholding by the zone owner.
 
-2. All publishing parties must be able to contribute to the NS RRset in
-   the zone.
+2. The solution MUST interface cleanly with mechanisms that enable
+   automatic updates of the parent-side NS RRset (once standardized).
 
-3. All publishing parties must be able to trigger the publication of a
+3. All publishing parties MUST be able to trigger the publication of a
    CSYNC record.
 
-4. All signing parties must be able to contribute to the DNSKEY RRset
+4. All signing parties MUST be able to contribute to the DNSKEY RRset
    in the zone.
 
-5. All signing parties must be able to contribute to the CDS RRset in
-   the zone.
+5. All signing parties MUST be able to contribute to the CDS and CDNSKEY
+   RRsets in the zone.
 
-6. All signing parties must be able to perform multi-signer key
+6. All signing parties MUST be able to perform multi-signer-aware key
    rollovers (ZSK/KSK/CSK).
 
-7. All DNS providers must be able to initiate synchronization of
+   TODO: Specify what a multi-signer key rollover is.
+
+7. All DNS providers MUST be able to initiate synchronization of
    changed data by notifying the other providers.
 
-8. All DNS providers must be able to fetch data from another DNS
+8. All DNS providers MUST be able to fetch data from another DNS
    provider using a secure mechanism.
 
-9. DNS service for unsigned zones must be supported.
+9. Updates to the delegation information in the parent zone are either
+    applied automatically if supported by the parent, or otherwise
+    by a designated party (likely the domain holder).
 
-10. Responsibility for updates to the delegation information in the
-    parent zone must be explicit.
-
-11. The zone owner must be able to add and remove DNS providers from
-    the multi-provider setup, and the providers' infrastructure must
+10. The zone owner MUST be able to add and remove DNS providers from
+    the multi-provider setup, and each provider's infrastructure must
     handle such changes automatically without manual intervention.
 
-# Desirable Features (i.e. not Requirements)
+# Soft Requirements
 
-1. A signing DNS provider should be able to use a "standard" DNSSEC
-   signer application. I.e. it should be possible to use signers that
+"Soft requirements" are those that are desirable, but the absence of
+which does not intrinsically eliminate a design.  These will largely
+be descriptive of the problems that are trying to be addressed with a
+new method, or features that would ease adoption.
+
+1. A signing DNS provider SHOULD be able to use a "standard DNSSEC
+   signer" application. I.e. it should be possible to use signers that
    are not specifically aware of the multi provider setup. "Standard
    DNSSEC signer" is defined as a bump-on-the-wire DNSSEC signer with
    support for multi-signer key rollovers.
+2. DNS service for unsigned zones MUST be supported.
 
 # Scenario-based analysis
 
