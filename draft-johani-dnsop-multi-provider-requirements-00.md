@@ -159,8 +159,233 @@ new method, or features that would ease adoption.
    are not specifically aware of the multi provider setup. "Standard
    DNSSEC signer" is defined as a bump-on-the-wire DNSSEC signer with
    support for multi-signer key rollovers.
-
 2. DNS service for unsigned zones MUST be supported.
+
+# Scenario-based analysis
+
+This section describes a system of analyzing scenarios with respect to
+zone contents and then derive requirements from the generation and
+modifications of those zones. The idea is that any mechanism can be linked
+through the requirements to particular contents of changes to the contents
+of a zone that are needed.
+
+## Scenarios
+
+This subsection lists the scenarios that are analyzed in order from low
+to high complexity.
+
+1) Simple multi-signer
+
+   This scenario consists of two providers A and B that each both sign and
+   provide the zone. Both providers receive an unsigned zone from the zone
+   owner. The parent has a CDS/CDNSKEY/CSYNC scanner.
+
+2) Simple unsigned zone with multiple providers
+
+   This scenarios consists of two providers A and B that each provide the
+   zone. Both providers receive the unsigned zone from the zone owner.
+   There is currently no mechanism for the parent to automatically pick
+   up changed to the NS RRset.
+
+3) Future work to let the parent update the NS RRset for an unsigned zone.
+
+(More scenarios are needed, also for parents without CDS/CDNSKEY/CSYNC scanner)
+
+## Simple multi-signer Scenario
+
+This subsection analyses the simple multi-signer scenario.
+
+### Zone contents
+
+Let's assume that each signer has a KSK and a ZSK called KSK_A, ZSK_A, KSK_B,
+and ZSK_B. Each provider has NS records, NS_A for provider A and NS_B for
+provider B.
+
+The quiescent state is the following:
+
+Provider A signs the zone (except for the DNSKEY, CDS and CDNSKEY RRsets) with
+ZSK_A. Provider B signs with ZSK_B. Provider A's DNSKEY RRset contains at 
+least KSK_A, ZSK_A, and ZSK_B. And is signed by at least KSK_A. Similarly,
+provider B's DNSKEY RRset contains at least KSK_B, ZSK_A, and ZSK_B. This
+RRset is signed by KSK_B. Both providers have an NS RRset that consists of
+NS_A and NS_B. At the parent the DS records refer to KSK_A and KSK_B.
+
+TODO: Isn't the quiescent state really when "everything is in sync", i.e.,
+all ZSK_* are published at all providers, all KSK_* are reflected in
+CDS/CDNSKEY records, and and the DS RRset refers to all CDS/CDNSKEY keys?
+-- This definition is broader, because a mid-rollover situation would also
+be called "quiescent" as long as the are no outstanding sync tasks between
+providers (and all are waiting for the rolling provider to make the next move).
+
+TODO: In the unsigned case, the quiescence definition includes NS and glue.
+Why not here?
+
+### ZSK rolls
+
+We assume that the zone of provide A is currently signed with ZSK_A and
+that provider wants to roll to ZSK_An. 
+
+Changes to the DNSKEY RRset require coordination.
+Other parts of the ZSK roll are local.
+
+When (for example) provider A changes its DNSKEY RRset to consist of KSK_A, ZSK_An and ZSK_B then provider B is informed to replace ZSK_A with ZSK_An.
+Provider A monitors the propagation of its own zone.
+Provider A also need to get confirmation from provider B that ZSK_An is fully propagated.
+
+### KSK rolls
+
+We assume provider A wants to roll to KSK_An. 
+
+Coordination is required regarding the contents of the CDS/CDNSKEY RRsets and
+their signatures. Provider A and B update each other about changes to the
+CDS/CDNSKEY RRsets including signatures.
+
+### Updating the NS RRset at the parent
+
+When provider A wants to change its NS RRset to NS_An, it can just update the
+NS RRset at the apex of the zone locally (leaving other providers' NS in the
+set unchanged). Provider A then tries to agree with
+provider B on a new NS RRset. When agreement is reached provider A adds a
+CSYNC record to the zone.
+
+TODO: Shouldn't all providers add an equivalent CSYNC record?
+
+Provider A monitors the parent NS RRset. When provider A notices the parent
+NS RRset contains NS_An it can try to agree with provider B to remove the
+CSYNC record.
+
+TOOD: Shouldn't all providers monitor the parent NS RRset? (Provider B
+should not remove the CSYNC record based on provider A's instruction, as
+long as it hasn't been acted upon.)
+
+### On-boarding a new provider
+
+To on-board provider C, provider MUST first ensure that its ZSK_C is in the
+DNSKEY RRsets of provider A and B. Then it MUST coordinate with provider A
+and C to update the DS RRset at the parent to refer to KSK_C. Finally
+provider C MUST coordinate with provider A and B to update the NS RRsets
+at the apex of A and B and at the parent to include NS_C.
+
+### Off-boarding 
+
+Off-boarding goes in the opposite order of on-boarding.
+
+### Requirements
+
+1) The zone owner specifies that provider A and provider B both sign
+   the zone and serve the zone. Providers A and B take full control over the 
+   NS RRset and the parent zone scans for CDS/CDNSKEY/CSYNC.
+
+2) The zone owner provides both providers with an unsigned copy of the zone.
+   The zone SHOULD NOT include the apex CDS, CDNSKEY, CSYNC, DNSKEY, and
+   NS RRsets. 
+
+3) There is a mechanism that allows a provider to inform another provider of
+   its current set of ZSKs.
+
+4) There is a mechanism that allows a provider to wait until another provider
+   has fully propagated the first provider's ZSKs.
+
+5) There is a mechanism that allows a provider to propose changes to the 
+   CDS/CDNSKEY RRsets and get agreement on the contents of the set.
+
+7) There is a mechanism that allows a provider to propose changes to the 
+   NS RRset and get agreement on the contents of the set.
+
+## Simple unsigned zone with multiple providers
+
+This subsection analyses the simple multi-provider scenario.
+
+### Zone contents
+
+Lets assume that each provider has NS records, NS_A for provider A and
+NS_B for provider B.
+
+The quiescent state is the following:
+
+Both providers serve the zone with an NS RRset that consists of
+NS_A and NS_B. At the parent the delegation NS RRset is the same.
+Where needed, the parent has glue consistent with the data in the zone.
+
+### Updating the NS RRset at the parent
+
+When provider A wants to change its NS RRset to NS_An, it can just update the
+NS RRset at the apex of the zone locally (leaving other providers' NS in the
+set unchanged). Provider A then tries to agree with provider B on a new NS RRset.
+
+Currently there is no mechanism to update the parent NS RRset automatically
+for unsigned zones. 
+
+An agent that operates on behalf of the zone owner has to be informed.
+This agent can then interface with the registrar to update the NS
+RRset and any required glue.
+
+### On-boarding a new provider
+
+To on-board provider C, provider C MUST coordinate with provider A and B to
+update the NS RRsets at the apex of A and B and at the parent to include NS_C.
+
+### Off-boarding 
+
+Off-boarding goes in the opposite order of on-boarding.
+
+### Requirements
+
+1) The zone owner provides both providers with an unsigned copy of the zone.
+   The zone SHOULD NOT include the apex NS RRset.
+
+2) There is a mechanism that allows a provider to propose changes to the 
+   NS RRset and get agreement on the contents of the set.
+
+## Future work to let the parent update the NS RRset for an unsigned zone.
+
+This subsection analyses the simple multi-provider scenario where the
+parent has a mechanism to automatically update the NS RRset.
+
+### Zone contents
+
+Lets assume that each provider has NS records, NS_A for provider A and
+NS_B for provider B.
+
+The quiescent state is the following:
+
+Both providers serve the zone with an NS RRset that consists of
+NS_A and NS_B. At the parent the delegation NS RRset is the same.
+Where needed, the parent has glue consistent with the data in the zone.
+
+### Updating the NS RRset at the parent
+
+When provider A wants to change its NS RRset to NS_An, it can just update the
+NS RRset at the apex of the zone locally (leaving other providers' NS in the
+set unchanged). Provider A then tries to agree with provider B on a new NS RRset.
+
+Using ideas from RFC 9615 (Automatic DNSSEC Bootstrapping Using Authenticated
+Signals from the Zone's Operator) a new protocol could be designed
+to update the parent NS RRset.
+
+If some of the current nameserver for the zone are in DNSSEC signed zones
+then they can published the new NS RRset under something like:
+_nsupdate.example.co.uk._signal.ns1.example.net
+
+There are there two problems that need to be solved:
+* The creation of a 'CNS' record that has a similar role as the CDS record.
+* A name scheme for in-bailiwick glue records. For example
+  ns1._nsupdate.example.co.uk._signalns1.example.net IN AAAA
+  could be the glue for ns1.example.co.uk.
+
+### On-boarding a new provider
+
+To on-board provider C, provider C MUST coordinate with provider A and B to
+update the NS RRsets at the apex of A and B and at the parent to include NS_C.
+
+### Off-boarding 
+
+Off-boarding goes in the opposite order of on-boarding.
+
+### Requirements
+
+1) A mechanism the signals the parent in a secure way that the parent
+   NS RRset needs to be updated.
 
 # Security Considerations
 
