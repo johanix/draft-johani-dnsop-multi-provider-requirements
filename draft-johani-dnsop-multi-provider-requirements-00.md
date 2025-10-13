@@ -146,6 +146,9 @@ enabling automation for core multi-provider scenarios.
     the multi-provider setup, and each provider's infrastructure must
     handle such changes automatically without manual intervention.
 
+11. The architecture MUST support providing an error reporting mechanism
+    from providers to zone owners.
+
 # Soft Requirements
 
 "Soft requirements" are those that are desirable, but the absence of
