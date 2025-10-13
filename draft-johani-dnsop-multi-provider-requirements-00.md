@@ -149,6 +149,9 @@ enabling automation for core multi-provider scenarios.
 11. The architecture MUST support providing an error reporting mechanism
     from providers to zone owners.
 
+12. All signing parties MUST ensure to not publish key sets containing
+    multiple keys of the same algorithm that share a keytag.
+
 # Soft Requirements
 
 "Soft requirements" are those that are desirable, but the absence of
