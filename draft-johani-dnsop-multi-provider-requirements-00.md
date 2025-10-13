@@ -206,6 +206,11 @@ Let's assume that each signer has a KSK and a ZSK called KSK_A, ZSK_A, KSK_B,
 and ZSK_B. Each provider has NS records, NS_A for provider A and NS_B for
 provider B.
 
+(CSK keys can be dealt with by regarding each as two identical keys with KSK
+and ZSK role, respectively. For example, provider A having CSK_A is equivalent
+to it using KSK_A and ZSK_A, where the keys are exactly identical. As no
+additional requirements follow, the scenario is not described further.)
+
 The quiescent state is the following:
 
 Provider A signs the zone (except for the DNSKEY, CDS and CDNSKEY RRsets) with
