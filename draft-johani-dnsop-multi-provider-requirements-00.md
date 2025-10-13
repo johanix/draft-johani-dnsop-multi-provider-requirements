@@ -150,7 +150,7 @@ enabling automation for core multi-provider scenarios.
     from providers to zone owners.
 
 12. All signing parties MUST ensure to not publish key sets containing
-    multiple keys of the same algorithm that share a keytag.
+    multiple keys that share a keytag (even across algorithms).
 
 # Soft Requirements
 
