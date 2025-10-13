@@ -128,10 +128,9 @@ enabling automation for core multi-provider scenarios.
 5. All signing parties MUST be able to contribute to the CDS and CDNSKEY
    RRsets in the zone.
 
-6. All signing parties MUST be able to perform multi-signer-aware key
-   rollovers (ZSK/KSK/CSK).
-
-   TODO: Specify what a multi-signer key rollover is.
+6. All signing parties MUST be able to perform rollovers or their key(s)
+   (ZSK, KSK, CSK), including the case of group-wide algorithm rollovers,
+   while retaining DNSSEC validatability throughout.
 
 7. All DNS providers MUST be able to initiate synchronization of
    changed data by notifying the other providers.
