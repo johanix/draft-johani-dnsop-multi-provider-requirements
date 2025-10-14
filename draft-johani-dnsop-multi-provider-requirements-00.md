@@ -211,24 +211,16 @@ and ZSK role, respectively. For example, provider A having CSK_A is equivalent
 to it using KSK_A and ZSK_A, where the keys are exactly identical. As no
 additional requirements follow, the scenario is not described further.)
 
-The quiescent state is the following:
+The target state is the following:
 
 Provider A signs the zone (except for the DNSKEY, CDS and CDNSKEY RRsets) with
 ZSK_A. Provider B signs with ZSK_B. Provider A's DNSKEY RRset contains at 
 least KSK_A, ZSK_A, and ZSK_B. And is signed by at least KSK_A. Similarly,
 provider B's DNSKEY RRset contains at least KSK_B, ZSK_A, and ZSK_B. This
-RRset is signed by KSK_B. Both providers have an NS RRset that consists of
-NS_A and NS_B. At the parent the DS records refer to KSK_A and KSK_B.
-
-TODO: Isn't the quiescent state really when "everything is in sync", i.e.,
-all ZSK_* are published at all providers, all KSK_* are reflected in
-CDS/CDNSKEY records, and and the DS RRset refers to all CDS/CDNSKEY keys?
--- This definition is broader, because a mid-rollover situation would also
-be called "quiescent" as long as the are no outstanding sync tasks between
-providers (and all are waiting for the rolling provider to make the next move).
-
-TODO: In the unsigned case, the quiescence definition includes NS and glue.
-Why not here?
+RRset is signed by KSK_B. At the parent the DS records refer to KSK_A and KSK_B.
+Both providers serve the zone with an NS RRset that consists of
+NS_A and NS_B. At the parent the delegation NS RRset is the same.
+Where needed, the parent has glue consistent with the data in the zone.
 
 ### ZSK rolls
 
@@ -255,18 +247,13 @@ CDS/CDNSKEY RRsets including signatures.
 When provider A wants to change its NS RRset to NS_An, it can just update the
 NS RRset at the apex of the zone locally (leaving other providers' NS in the
 set unchanged). Provider A then tries to agree with
-provider B on a new NS RRset. When agreement is reached provider A adds a
+provider B on a new NS RRset. When agreement is reached, all providers add a
 CSYNC record to the zone.
-
-TODO: Shouldn't all providers add an equivalent CSYNC record?
 
 Provider A monitors the parent NS RRset. When provider A notices the parent
 NS RRset contains NS_An it can try to agree with provider B to remove the
-CSYNC record.
-
-TOOD: Shouldn't all providers monitor the parent NS RRset? (Provider B
-should not remove the CSYNC record based on provider A's instruction, as
-long as it hasn't been acted upon.)
+CSYNC record. (Alternatively, each provider monitors the parent and removes
+the CSYNC record once the parent-side NS RRset was updated as expected.)
 
 ### On-boarding a new provider
 
@@ -311,7 +298,7 @@ This subsection analyses the simple multi-provider scenario.
 Lets assume that each provider has NS records, NS_A for provider A and
 NS_B for provider B.
 
-The quiescent state is the following:
+The target state is the following:
 
 Both providers serve the zone with an NS RRset that consists of
 NS_A and NS_B. At the parent the delegation NS RRset is the same.
@@ -357,7 +344,7 @@ parent has a mechanism to automatically update the NS RRset.
 Lets assume that each provider has NS records, NS_A for provider A and
 NS_B for provider B.
 
-The quiescent state is the following:
+The target state is the following:
 
 Both providers serve the zone with an NS RRset that consists of
 NS_A and NS_B. At the parent the delegation NS RRset is the same.
