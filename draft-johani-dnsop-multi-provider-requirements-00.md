@@ -164,7 +164,7 @@ new method, or features that would ease adoption.
    are not specifically aware of the multi provider setup. "Standard
    DNSSEC signer" is defined as a bump-on-the-wire DNSSEC signer with
    support for multi-signer key rollovers.
-2. DNS service for unsigned zones MUST be supported.
+2. DNS service for unsigned zones SHOULD be supported.
 
 # Scenario-based analysis
 
